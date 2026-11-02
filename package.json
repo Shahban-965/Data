@@ -1,0 +1,48 @@
+{
+  "name": "shakeel-networking-ultimate",
+  "version": "1.0.0",
+  "description": "Shakeel Networking \u2014 offline portable IT Lab Management System with USB JSON database",
+  "main": "main.js",
+  "author": "Shakeel Networking",
+  "license": "UNLICENSED",
+  "scripts": {
+    "start": "electron .",
+    "build:win": "electron-builder --win dir && electron-builder --win portable",
+    "build:portable": "electron-builder --win portable",
+    "check": "node tests/syntax-check.js && node --test tests/*.test.js"
+  },
+  "devDependencies": {
+    "electron": "^35.0.0",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.shakeelnetworking.itlab",
+    "productName": "Shakeel Networking Ultimate",
+    "asar": true,
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "index.html",
+      "css/**/*",
+      "js/**/*",
+      "vendor/**/*",
+      "assets/**/*",
+      "manifest.json",
+      "main.js",
+      "preload.js",
+      "README.md",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        "dir",
+        "portable"
+      ],
+      "artifactName": "Shakeel-Networking-Ultimate-${version}-Windows.${ext}"
+    },
+    "portable": {
+      "artifactName": "Shakeel-Networking-Ultimate-${version}-Portable.${ext}"
+    }
+  }
+}

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob:; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Shakeel Networking Ultimate — portable offline IT Lab Management System with USB JSON file database.">
+<meta name="theme-color" content="#080d18">
+<title>Shakeel Networking — Ultimate Portable</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231f4e79'/%3E%3Cpath d='M8 10h16v9H8z' fill='none' stroke='%23fff' stroke-width='2' stroke-linejoin='round'/%3E%3Cpath d='M12 23h8M16 19v4' stroke='%23fff' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
+
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/reset.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/tables.css">
+<link rel="stylesheet" href="css/forms.css">
+<link rel="stylesheet" href="css/modals.css">
+<link rel="stylesheet" href="css/dashboard.css">
+<link rel="stylesheet" href="css/responsive.css">
+<link rel="stylesheet" href="css/theme.css">
+<link rel="stylesheet" href="css/redesign.css">
+<link rel="stylesheet" href="css/fixes.css">
+<link rel="stylesheet" href="css/arrows.css">
+<link rel="stylesheet" href="css/ultimate.css">
+<script src="vendor/motion/motion.js"></script>
+<script src="js/appearance.js"></script>
+<script src="js/gate.js"></script>
+</head>
+<body>
+
+<!-- Boot screen ------------------------------------------------------- -->
+<div id="appLoader" role="status" aria-live="polite">
+  <div class="boot">
+    <div class="boot-logo" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="4" width="20" height="12" rx="2"></rect><path d="M8 20h8M12 16v4"></path>
+      </svg>
+    </div>
+    <div class="boot-title">Shakeel Networking</div>
+    <div class="boot-msg">ULTIMATE PORTABLE EDITION · JSON FILE DATABASE</div>
+    <div class="boot-msg">Loading your local data…</div>
+    <div class="boot-bar"><span></span></div>
+  </div>
+</div>
+
+<a href="#appMain" class="skip-link">Skip to main content</a>
+
+<!-- Application shell -------------------------------------------------- -->
+<div class="app-shell">
+
+  <!-- Brand -->
+  <div class="brand">
+    <div class="brand-logo" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="4" width="20" height="12" rx="2"></rect><path d="M8 20h8M12 16v4"></path>
+      </svg>
+    </div>
+    <div class="brand-text">
+      <div class="brand-name">Shakeel Networking</div>
+      <div class="brand-sub">Management System</div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="app-header" role="banner">
+    <button type="button" class="icon-btn" id="sidebarToggle" aria-label="Toggle navigation menu" title="Toggle menu (collapse sidebar)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18M3 6h18M3 18h18"></path></svg>
+    </button>
+
+    <div class="global-search" role="search">
+      <span class="gs-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+      </span>
+      <label class="sr-only" for="globalSearch">Search all records</label>
+      <input type="text" id="globalSearch" placeholder="Search PCs, staff, maintenance, store items, purchases…"
+             autocomplete="off" role="combobox" aria-expanded="false" aria-controls="gsResults" aria-autocomplete="list">
+      <span class="gs-kbd" aria-hidden="true">Ctrl K</span>
+      <div class="gs-results" id="gsResults" role="listbox" aria-label="Search results"></div>
+    </div>
+
+    <div class="header-right">
+      <div class="header-clock" aria-hidden="true">
+        <div class="hc-time">--:--</div>
+        <div class="hc-date">—</div>
+      </div>
+
+      <span class="hdr-sep" aria-hidden="true"></span>
+
+      <button type="button" class="icon-btn" id="quickAddBtn" aria-label="Quick add a record" title="Quick add (N)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
+      </button>
+
+      <div class="dropdown-wrap">
+        <button type="button" class="icon-btn" id="alertsBtn" aria-label="Alerts" aria-expanded="false" aria-haspopup="true" title="Alerts">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.7 21a2 2 0 0 1-3.4 0"></path></svg>
+          <span class="icon-badge hidden" id="alertCount">0</span>
+        </button>
+        <div class="dropdown-panel" id="alertsPanel" role="menu" aria-label="Alerts">
+          <div class="dropdown-head">Alerts &amp; attention required</div>
+          <div class="dropdown-body"></div>
+          <div class="dropdown-foot">Alerts are generated live from your records</div>
+        </div>
+      </div>
+
+      <span class="hdr-sep" aria-hidden="true"></span>
+
+      <div class="dropdown-wrap">
+        <button type="button" class="profile-chip" id="profileBtn" aria-expanded="false" aria-haspopup="true">
+          <span class="avatar" id="profileAvatar">AD</span>
+          <span class="profile-meta">
+            <span class="profile-name" id="profileName">Shakeel Ahmed</span>
+            <span class="profile-role" id="profileRole">Admin</span>
+          </span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+        </button>
+        <div class="dropdown-panel right" id="profilePanel" role="menu" aria-label="Account menu">
+          <div class="dropdown-head">Application</div>
+          <div class="dropdown-body">
+            <button type="button" class="dd-item" data-go="settings" role="menuitem">
+              <span class="dd-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 7 19.4a1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.7 1.7 0 0 0 3 15a1.7 1.7 0 0 0-1.5-1H1a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 3 9a1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.7 1.7 0 0 0 9 3.6V3a2 2 0 1 1 4 0v.1A1.7 1.7 0 0 0 15 4.6a1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1A1.7 1.7 0 0 0 20.4 9v0c.1.7.7 1.2 1.4 1.2H22a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg></span>
+              <span class="dd-body"><span class="dd-title">Settings</span><span class="dd-sub">Labs, preferences, data</span></span>
+            </button>
+            <button type="button" class="dd-item" data-go="backup" role="menuitem">
+              <span class="dd-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><path d="M17 21v-8H7v8M7 3v5h8"></path></svg></span>
+              <span class="dd-body"><span class="dd-title">Export full backup</span><span class="dd-sub">Download a .json backup now</span></span>
+            </button>
+            <button type="button" class="dd-item" data-go="reports" role="menuitem">
+              <span class="dd-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"></path><path d="M7 15l4-5 3 3 5-7"></path></svg></span>
+              <span class="dd-body"><span class="dd-title">Reports</span><span class="dd-sub">Generate Excel reports</span></span>
+            </button>
+          </div>
+          <div class="dropdown-foot">Offline · JSON files stored beside the app</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <nav class="app-sidebar" id="appSidebar" aria-label="Main navigation">
+    <div class="nav-list" id="navList"></div>
+    <div class="sidebar-foot">
+      <div class="storage-meter" title="Approximate LocalStorage usage">
+        <div class="sm-top"><span>Portable database</span><span class="sm-value">JSON</span></div>
+        <div class="sm-bar"><div class="sm-fill" style="width:1%"></div></div>
+      </div>
+      <div class="sidebar-note">Offline · USB DATA folder</div>
+      <button type="button" class="data-folder-btn" id="openDataFolder" title="Open portable DATA folder">Open DATA folder</button>
+      <button type="button" class="data-folder-btn data-backup-btn" id="createDataBackup" title="Create a complete snapshot of all JSON data">Create safety backup</button>
+    </div>
+  </nav>
+
+  <!-- Main -->
+  <main class="app-main" id="appMain" tabindex="-1"></main>
+
+  <div class="sidebar-backdrop" aria-hidden="true"></div>
+</div>
+
+<div id="modalRoot" class="modal-root"></div>
+<div id="toastStack" class="toast-stack" role="status" aria-live="polite"></div>
+
+<noscript>
+  <div style="padding:40px;font-family:system-ui,sans-serif;max-width:640px;margin:0 auto">
+    <h1 style="font-size:20px">JavaScript is required</h1>
+    <p>This IT Lab Management System runs entirely in your browser and needs JavaScript enabled to work.</p>
+  </div>
+</noscript>
+
+<!-- Excel engine: SheetJS. xlsx.full.min.js provides the codepage tables and
+     the full reader; xlsx-js-style adds cell-style support to the writer. -->
+<script src="vendor/xlsx/xlsx.full.min.js"></script>
+<script src="vendor/xlsx/xlsx-js-style.min.js"></script>
+
+<!-- Application modules (classic scripts, dependency order, file:// safe) -->
+<script src="js/utils.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/state.js"></script>
+<script src="js/toast.js"></script>
+<script src="js/modal.js"></script>
+<script src="js/validation.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/activity-log.js"></script>
+<script src="js/schemas.js"></script>
+<script src="js/excel.js"></script>
+<script src="js/importer.js"></script>
+<script src="js/stock.js"></script>
+<script src="js/settings.js"></script>
+<script src="js/inventory.js"></script>
+<script src="js/staff.js"></script>
+<script src="js/maintenance.js"></script>
+<script src="js/store.js"></script>
+<script src="js/purchases.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/reports.js"></script>
+<script src="js/archive.js"></script>
+<script src="js/backup.js"></script>
+<script src="js/search.js"></script>
+<script src="js/router.js"></script>
+<script src="js/seed-data.js"></script>
+<script src="js/app.js"></script>
+<script src="js/motion-fx.js"></script>
+<script src="js/motion2.js"></script>
+<script src="js/arrows.js"></script>
+</body>
+</html>

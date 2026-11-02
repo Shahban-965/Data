@@ -1,0 +1,50 @@
+/* arrows.css — arrow effect animations (cursor, click burst, sliding arrows, back-to-top). Additive. */
+.arrow-burst{position:fixed;width:12px;height:14px;z-index:99999;pointer-events:none;
+  background:linear-gradient(135deg,var(--ac1,#7c5cff),var(--ac2,#19e3b1));clip-path:polygon(50% 0,100% 100%,50% 76%,0 100%);
+  filter:drop-shadow(0 0 4px color-mix(in srgb,var(--ac1,#7c5cff) 70%,transparent))}
+/* back-to-top arrow */
+#arrowTop{position:fixed;right:22px;bottom:22px;width:46px;height:46px;border-radius:50%;border:1px solid var(--border);z-index:80;display:grid;place-items:center;cursor:pointer;
+  background:var(--grad,linear-gradient(135deg,#7c5cff,#19e3b1));color:#06130f;box-shadow:0 12px 28px -10px color-mix(in srgb,var(--ac1,#7c5cff) 80%,transparent);
+  opacity:0;transform:translateY(24px) scale(.8);pointer-events:none;transition:opacity .25s ease,transform .3s cubic-bezier(.22,1,.36,1)}
+#arrowTop svg{width:22px;height:22px}
+#arrowTop.show{opacity:1;transform:none;pointer-events:auto}
+#arrowTop.show svg{animation:arrowBob 1.6s ease-in-out infinite}
+#arrowTop:hover{transform:translateY(-3px) scale(1.06)}
+@keyframes arrowBob{0%,100%{transform:translateY(2px)}50%{transform:translateY(-3px)}}
+/* sliding arrows inside buttons ("View all →") */
+.btn.has-arrow svg,.dd-item.has-arrow svg{transition:transform .25s cubic-bezier(.22,1,.36,1)}
+.btn.has-arrow:hover svg:last-child{animation:arrowNudge .9s ease-in-out infinite}
+@keyframes arrowNudge{0%,100%{transform:translateX(0)}50%{transform:translateX(5px)}}
+/* menu: arrow slides in on hover, bobs on the active page */
+.nav-item{position:relative}
+.nav-item::after{content:"";position:absolute;right:12px;top:50%;width:14px;height:14px;margin-top:-7px;opacity:0;transform:translateX(-10px);pointer-events:none;
+  background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14M12 5l7 7-7 7'/%3E%3C/svg%3E") center/contain no-repeat;
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14M12 5l7 7-7 7'/%3E%3C/svg%3E") center/contain no-repeat;
+  transition:opacity .25s ease,transform .3s cubic-bezier(.22,1,.36,1)}
+.nav-item .nav-count{transition:margin .25s ease}
+.nav-item:hover::after{opacity:.85;transform:translateX(0)}
+.nav-item:hover .nav-count{margin-right:20px}
+.nav-item.active::after,.nav-item[aria-current="page"]::after{opacity:1;transform:translateX(0);animation:arrowSlide 1.5s ease-in-out infinite}
+.nav-item.active .nav-count,.nav-item[aria-current="page"] .nav-count{margin-right:20px}
+@keyframes arrowSlide{0%,100%{transform:translateX(0)}50%{transform:translateX(4px)}}
+.app-shell.sidebar-collapsed .nav-item::after{display:none}
+/* switch everything off cleanly */
+html[data-arrows="off"] .arrow-burst,html[data-arrows="off"] #arrowTop{display:none!important}
+html[data-arrows="off"] .nav-item::after{display:none}
+html[data-arrows="off"] .btn.has-arrow:hover svg:last-child,html[data-motion="off"] .btn.has-arrow:hover svg:last-child{animation:none}
+html[data-motion="off"] html[data-motion="off"] .arrow-burst{display:none!important}
+html[data-motion="off"] .nav-item.active::after{animation:none}
+@media (prefers-reduced-motion:reduce){.arrow-burst{display:none!important}#arrowTop.show svg,.nav-item.active::after{animation:none}}
+@media (max-width:900px){#arrowTop{right:14px;bottom:14px;width:42px;height:42px}}
+
+
+/* REAL arrow mouse pointer (browser-drawn: no lag, no trail, tip = click point) */
+html.arrow-real,html.arrow-real *{cursor:var(--arrow-cur) 5 3,default!important}
+html.arrow-real a,html.arrow-real button,html.arrow-real .btn,html.arrow-real .icon-btn,html.arrow-real .nav-item,html.arrow-real .tab,
+html.arrow-real [role="button"],html.arrow-real select,html.arrow-real label.check,html.arrow-real tr.clickable,html.arrow-real summary,
+html.arrow-real input[type="checkbox"],html.arrow-real input[type="radio"],html.arrow-real input[type="range"],html.arrow-real input[type="file"],
+html.arrow-real .ap-opt,html.arrow-real .ap-sw,html.arrow-real .ap-pre,html.arrow-real .th-in,html.arrow-real th.sortable,html.arrow-real #arrowTop,
+html.arrow-real a *,html.arrow-real button *,html.arrow-real .btn *,html.arrow-real .nav-item *,html.arrow-real .tab *,html.arrow-real [role="button"] *{cursor:var(--arrow-cur-hot) 5 3,pointer!important}
+html.arrow-real input[type="text"],html.arrow-real input[type="search"],html.arrow-real input[type="number"],html.arrow-real input[type="password"],
+html.arrow-real input[type="email"],html.arrow-real input[type="date"],html.arrow-real input[type="month"],html.arrow-real textarea{cursor:text!important}
+html.arrow-real button:disabled,html.arrow-real .btn:disabled{cursor:not-allowed!important}

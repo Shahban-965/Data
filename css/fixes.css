@@ -1,0 +1,99 @@
+/* ==========================================================================
+   fixes.css — additive bug-fix + design polish layer. Loaded LAST.
+   Nothing is removed from the existing stylesheets; these rules only
+   correct bugs and refine the design on top of them.
+   ========================================================================== */
+
+/* 1) TABLES: `min-width:max-content` on a 100%-wide table blew every table up
+      to ~14,000px (columns thousands of px wide, only 2 columns visible).
+      Use a sane minimum instead; the wrapper still scrolls when needed. */
+table.data-table { min-width: 720px !important; width: 100%; }
+.table-wrap { overflow-x: auto; overflow-y: visible; }
+table.data-table td { word-break: normal; overflow-wrap: anywhere; }
+table.data-table td.cell-actions, table.data-table td.cell-id,
+table.data-table td .badge, table.data-table td .chip { overflow-wrap: normal; }
+
+/* 2) LIGHT MODE: old `data-theme="dark"` rules still match (data-theme stays
+      "dark"), so re-assert correct colours whenever data-mode is light. */
+html[data-mode="light"] .tab.active .tab-count { background: color-mix(in srgb, var(--ac1) 16%, #fff); color: var(--ac1); }
+html[data-mode="light"] .storage-meter .sm-value,
+html[data-mode="light"] .storage-meter .sm-top strong { color: var(--text-primary) !important; }
+html[data-mode="light"] .sidebar-note { color: var(--text-muted) !important; }
+html[data-mode="light"] .tl-dot { box-shadow: 0 0 0 3px var(--bg-surface-2); }
+html[data-mode="light"] .report-card.active,
+html[data-mode="light"] .check-card.selected,
+html[data-mode="light"] .gs-item.active { background: color-mix(in srgb, var(--ac1) 9%, var(--bg-surface)); }
+html[data-mode="light"] .dropzone:hover, html[data-mode="light"] .dropzone.dragover { background: color-mix(in srgb, var(--ac1) 8%, var(--bg-surface)); }
+html[data-mode="light"] .gs-item-ico, html[data-mode="light"] .modal-head-ico { background: color-mix(in srgb, var(--ac1) 12%, #fff); color: var(--ac1); }
+html[data-mode="light"] .icon-btn.active { background: color-mix(in srgb, var(--ac1) 14%, #fff); color: var(--ac1); }
+html[data-mode="light"] ::selection { background: color-mix(in srgb, var(--ac1) 30%, #fff); color: #0b1020; }
+html[data-mode="light"] select,
+html[data-mode="light"] input[type="date"],
+html[data-mode="light"] input[type="month"] { color-scheme: light; }
+html[data-mode="dark"] select,
+html[data-mode="dark"] input[type="date"],
+html[data-mode="dark"] input[type="month"] { color-scheme: dark; }
+
+/* 3) SIDEBAR: bottom items (Backup, Reports, Settings) were clipped with no
+      visible scrollbar on normal laptop heights. Make the nav scroll cleanly,
+      keep the footer pinned, and tighten spacing on short screens. */
+.app-sidebar { display: flex; flex-direction: column; min-height: 0; }
+.nav-list { min-height: 0; flex: 1 1 auto; overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; scrollbar-color: var(--border-strong, rgba(128,128,160,.45)) transparent; }
+.nav-list::-webkit-scrollbar { width: 6px; }
+.nav-list::-webkit-scrollbar-thumb { background: rgba(128,128,160,.4); border-radius: 6px; }
+.sidebar-foot { flex: 0 0 auto; }
+@media (max-height: 900px) {
+  .nav-section-title { padding: 10px 12px 4px !important; }
+  .nav-item { padding: 8px 14px !important; margin: 1px 0 !important; }
+  .sidebar-note { display: none; }
+  .logout-btn, .sidebar-foot .btn { min-height: 38px; margin-top: 8px; }
+  .storage-meter { padding: 9px 12px; }
+}
+@media (max-height: 760px) {
+  .storage-meter { display: none; }
+}
+
+/* 4) BRAND: "Shakeel Networking" was cut to "Shakeel Network…". */
+.brand { padding: 0 14px !important; gap: 10px !important; }
+.brand-name { font-size: 15px !important; white-space: nowrap; overflow: visible !important; text-overflow: clip !important; }
+.brand-text { min-width: 0; overflow: visible; }
+
+/* 5) STAT GRIDS: 6 cards left an orphan card on a second row. Allow smaller
+      tiles so they sit in balanced rows. */
+.stat-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)) !important; }
+.stat-grid .stat-label { font-size: 10.5px; letter-spacing: .06em; line-height: 1.25; }
+
+/* 6) TOOLBAR: search placeholder was truncated ("Search PC name, serial, pr"). */
+.toolbar-search { flex: 1 1 300px; max-width: 420px; min-width: 220px; }
+.toolbar-search input { text-overflow: ellipsis; }
+
+/* 7) HEADER: global search placeholder + keyboard hint overlap. */
+.global-search input { padding-right: 64px; text-overflow: ellipsis; }
+
+/* 8) MOBILE: quick light/dark switch was hidden below 460px. Keep it, hide the
+      clock instead so the header still fits. */
+@media (max-width: 460px) {
+  .header-right #themeQuick { display: inline-grid !important; }
+  .header-clock, .hdr-sep { display: none !important; }
+  .profile-meta, .profile-chip .chev { display: none; }
+}
+
+/* 9) Accessibility + polish */
+:focus-visible { outline: 2px solid var(--ac1, #7c5cff); outline-offset: 2px; }
+button:disabled, .btn:disabled { cursor: not-allowed; opacity: .55; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}
+html[data-motion="off"] *, html[data-motion="off"] *::before, html[data-motion="off"] *::after { animation: none !important; transition: none !important; }
+
+/* 10) TABLE ACTIONS: keep the row-action buttons reachable (pinned to the right
+       edge) while the rest of the table scrolls sideways; tidy sticky cells. */
+table.data-table td.cell-actions { position: sticky; right: 0; z-index: 1; background: var(--bg-surface); box-shadow: -10px 0 14px -12px rgba(0,0,0,.35); }
+table.data-table thead th:last-child:not(.sortable) { position: sticky; right: 0; z-index: 3; }
+table.data-table tbody tr:hover td.cell-actions { background: var(--bg-surface-2) !important; }
+table.data-table tr.row-warn td:first-child { background: color-mix(in srgb, #f59e0b 9%, var(--bg-surface)); }
+table.data-table tbody td { padding-inline: 12px; }
+table.data-table thead th { padding-inline: 12px; }
+
+/* 11) DARK MODE: active tab count badge was dark-on-dark. */
+html[data-mode="dark"] .tab.active .tab-count { background: color-mix(in srgb, var(--ac1) 28%, transparent); color: #fff; }

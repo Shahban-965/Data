@@ -1,0 +1,162 @@
+/* ==========================================================================
+   variables.css — Design tokens for IT Lab Management System
+   ========================================================================== */
+
+:root {
+  /* ---- Brand / accent ---- */
+  --brand-50:  #eef4ff;
+  --brand-100: #dbe6fe;
+  --brand-200: #bfd3fe;
+  --brand-300: #93b4fd;
+  --brand-400: #608cfa;
+  --brand-500: #3b66f6;
+  --brand-600: #2549eb;
+  --brand-700: #1d38d8;
+  --brand-800: #1e30af;
+  --brand-900: #1e2e8a;
+
+  /* ---- Neutrals (light) ---- */
+  --bg-body:        #f4f6fa;
+  --bg-surface:     #ffffff;
+  --bg-surface-2:   #f8fafc;
+  --bg-surface-3:   #f1f5f9;
+  --bg-inverse:     #0f172a;
+  --bg-overlay:     rgba(15, 23, 42, 0.55);
+
+  --text-primary:   #0f172a;
+  --text-secondary: #475569;
+  --text-muted:     #74839a;
+  --text-inverse:   #f8fafc;
+
+  --border:         #e2e8f0;
+  --border-strong:  #cbd5e1;
+  --border-focus:   var(--brand-500);
+
+  /* ---- Semantic ---- */
+  --success-bg:   #ecfdf5;
+  --success-fg:   #047857;
+  --success-bd:   #a7f3d0;
+  --success-solid:#10b981;
+
+  --warn-bg:      #fffbeb;
+  --warn-fg:      #b45309;
+  --warn-bd:      #fde68a;
+  --warn-solid:   #f59e0b;
+
+  --danger-bg:    #fef2f2;
+  --danger-fg:    #b91c1c;
+  --danger-bd:    #fecaca;
+  --danger-solid: #ef4444;
+
+  --info-bg:      #eff6ff;
+  --info-fg:      #1d4ed8;
+  --info-bd:      #bfdbfe;
+  --info-solid:   #3b82f6;
+
+  --neutral-bg:   #f1f5f9;
+  --neutral-fg:   #475569;
+  --neutral-bd:   #e2e8f0;
+  --neutral-solid:#94a3b8;
+
+  --purple-bg:    #f5f3ff;
+  --purple-fg:    #6d28d9;
+  --purple-bd:    #ddd6fe;
+  --purple-solid: #8b5cf6;
+
+  /* ---- Chart palette ---- */
+  --c1: #3b66f6;
+  --c2: #10b981;
+  --c3: #f59e0b;
+  --c4: #ef4444;
+  --c5: #8b5cf6;
+  --c6: #06b6d4;
+  --c7: #ec4899;
+  --c8: #64748b;
+
+  /* ---- Layout metrics ---- */
+  --sidebar-w:          252px;
+  --sidebar-w-collapsed: 68px;
+  --header-h:           58px;
+
+  /* ---- Radii ---- */
+  --r-xs: 4px;
+  --r-sm: 6px;
+  --r-md: 8px;
+  --r-lg: 12px;
+  --r-xl: 16px;
+  --r-full: 999px;
+
+  /* ---- Shadows ---- */
+  --sh-xs: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --sh-sm: 0 1px 3px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --sh-md: 0 4px 12px rgba(15, 23, 42, 0.08), 0 2px 4px rgba(15, 23, 42, 0.04);
+  --sh-lg: 0 12px 32px rgba(15, 23, 42, 0.12), 0 4px 8px rgba(15, 23, 42, 0.05);
+  --sh-xl: 0 24px 56px rgba(15, 23, 42, 0.18);
+
+  /* ---- Typography ---- */
+  --font-sans: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "Cascadia Mono", "SF Mono", "Consolas", "Liberation Mono", monospace;
+
+  --fs-xs:  11.5px;
+  --fs-sm:  12.5px;
+  --fs-base:13.5px;
+  --fs-md:  15px;
+  --fs-lg:  17px;
+  --fs-xl:  20px;
+  --fs-2xl: 25px;
+  --fs-3xl: 31px;
+
+  /* ---- Spacing ---- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+
+  /* ---- Motion ---- */
+  --t-fast: 120ms ease;
+  --t-base: 180ms ease;
+
+  /* ---- z-index ---- */
+  --z-header: 60;
+  --z-sidebar: 70;
+  --z-dropdown: 200;
+  --z-modal: 500;
+  --z-toast: 900;
+}
+
+/* ==========================================================================
+   Dark theme
+   ========================================================================== */
+html[data-theme="dark"] {
+  --bg-body:      #0b1120;
+  --bg-surface:   #131c2e;
+  --bg-surface-2: #182236;
+  --bg-surface-3: #1e293b;
+  --bg-inverse:   #f8fafc;
+  --bg-overlay:   rgba(2, 6, 16, 0.7);
+
+  --text-primary:   #e8edf6;
+  --text-secondary: #a8b5ca;
+  --text-muted:     #7c8aa3;
+  --text-inverse:   #0f172a;
+
+  --border:        #253248;
+  --border-strong: #35455f;
+
+  --success-bg: #06281e; --success-fg: #4ade9f; --success-bd: #124834;
+  --warn-bg:    #2b1f06; --warn-fg:    #fbbf5c; --warn-bd:    #4d3708;
+  --danger-bg:  #2c0f10; --danger-fg:  #fca5a5; --danger-bd:  #501e20;
+  --info-bg:    #0d1c38; --info-fg:    #93b4fd; --info-bd:    #1c3364;
+  --neutral-bg: #1c2739; --neutral-fg: #a8b5ca; --neutral-bd: #2a3752;
+  --purple-bg:  #1e1638; --purple-fg:  #c4b5fd; --purple-bd:  #362a63;
+
+  --sh-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --sh-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --sh-md: 0 4px 12px rgba(0, 0, 0, 0.45);
+  --sh-lg: 0 12px 32px rgba(0, 0, 0, 0.55);
+  --sh-xl: 0 24px 56px rgba(0, 0, 0, 0.65);
+}
