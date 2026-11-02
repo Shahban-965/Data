@@ -514,11 +514,9 @@
           ITL.icon('package') + 'Add to store inventory</button></div></div></div>') +
         '</div>' +
 
-        '<div class="detail-section">' + ui.sectionTitle('Remarks & audit', 'info') +
+        '<div class="detail-section">' + ui.sectionTitle('Remarks', 'info') +
         '<div class="detail-grid">' +
         ui.field('Remarks', r.remarks, { full: true }) +
-        ui.field('Created', U.fmtDateTime(r.createdAt)) +
-        ui.field('Last updated', U.fmtDateTime(r.updatedAt)) +
         '</div></div>',
       footer:
         '<button type="button" class="btn btn-danger-soft" data-pu="delete">' + ITL.icon('trash') + 'Delete</button>' +
@@ -634,6 +632,7 @@
             filenameBase: 'IT_Lab_Purchases',
             totals: ['quantity', 'keyboard', 'mouse', 'lcd', 'ethernetConnector', 'powerCable', 'vgaCable']
           });
+      if (!name) return;
           ITL.activity.log('Purchases', 'Exported', '', 'Downloaded ' + name + ' (' + data.length + ' records)');
           ITL.toast.success('Excel downloaded', name);
         });

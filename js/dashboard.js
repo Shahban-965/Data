@@ -1,5 +1,5 @@
 /* ==========================================================================
-   dashboard.js — live dashboard driven entirely by LocalStorage data
+   dashboard.js — live dashboard driven entirely by the permanent DATA folder
    ========================================================================== */
 (function (w) {
   'use strict';
@@ -50,7 +50,7 @@
       '<div class="card mt-4"><div class="card-body">' +
       '<div class="alert alert-info">' + ITL.icon('database') +
       '<div class="alert-body"><div class="alert-title">Where your data lives</div>' +
-      'Everything is saved in <b>this browser on this computer</b> using LocalStorage. It survives page refreshes, browser restarts and works completely offline. ' +
+      'Every record is saved permanently in the <b>DATA</b> folder as JSON + TXT. Copy the whole project folder and the same data travels with it — no RAM-only storage. ' +
       'It does <b>not</b> sync automatically to other computers — use <b>Backup &amp; Restore</b> or Excel export to move data between machines.</div></div>' +
       '</div></div>';
 
@@ -236,7 +236,7 @@
     var meta = S.get(K.meta) || {};
     return '<div class="' + (S.isAvailable() ? 'db-status' : 'db-status warn') + '">' +
       ITL.icon(S.isAvailable() ? 'checkCircle' : 'alert') +
-      (S.isAvailable() ? 'LocalStorage active · data is saved' : 'LocalStorage unavailable') + '</div>' +
+      (S.isAvailable() ? 'DATA folder writable · every save verified' : 'DATA folder NOT writable') + '</div>' +
       '<div style="margin-top:12px">' +
       '<div class="row-2" style="justify-content:space-between;font-size:12px"><span class="muted">Storage used</span>' +
       '<b>' + U.bytes(usage.bytes) + '</b></div>' +
@@ -314,6 +314,10 @@
 
   /* ===================================================== DASHBOARD REPORT */
   dash.downloadReport = function () {
+    if (S.isEmpty()) {
+      ITL.toast.warn('Nothing to download', 'The database is empty. No empty Excel file was created.');
+      return;
+    }
     ITL.modal.withBusy('Generating Excel…', 'Building the executive dashboard report', function () {
       var st = ITL.data.stats();
       var s = ITL.settings.get();
@@ -467,7 +471,8 @@
       });
 
       var fname = 'IT_Lab_Dashboard_Report_' + U.stampDate() + '.xlsx';
-      ITL.excel.download({ filename: fname, title: 'Dashboard Report', sheets: sheets });
+      var snExportGuard = ITL.excel.download({ filename: fname, title: 'Dashboard Report', sheets: sheets });
+      if (!snExportGuard) return;
       ITL.activity.log('Dashboard', 'Exported', '', 'Downloaded dashboard executive report');
       ITL.toast.success('Excel downloaded', fname);
     });

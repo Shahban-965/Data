@@ -26,6 +26,14 @@
   var ICONS = { success: 'check', error: 'x', warn: 'alert', info: 'info' };
 
   function show(type, title, msg, duration) {
+    // Never congratulate the user for a change that was not written to disk.
+    if (type === 'success' && ITL.storage && ITL.storage.lastSaveFailedAt &&
+      Date.now() - ITL.storage.lastSaveFailedAt < 10000) {
+      type = 'error';
+      title = 'Not saved';
+      msg = 'The DATA folder could not be written. Reconnect the drive and try again — nothing was kept in RAM.';
+      duration = 12000;
+    }
     var host = root();
     var id = 'toast-' + (++seq);
     var el = U.el('div', 'toast ' + type);

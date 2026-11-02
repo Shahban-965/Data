@@ -629,11 +629,9 @@
         (tx ? '<div class="mt-4"><button type="button" class="btn btn-secondary btn-sm" data-mt="openitem">' + ITL.icon('externalLink') + 'Open store item</button></div>' : '') +
         '</div>' +
 
-        '<div class="detail-section">' + ui.sectionTitle('Remarks & audit', 'info') +
+        '<div class="detail-section">' + ui.sectionTitle('Remarks', 'info') +
         '<div class="detail-grid">' +
         ui.field('Remarks', r.remarks, { full: true }) +
-        ui.field('Created', U.fmtDateTime(r.createdAt)) +
-        ui.field('Last updated', U.fmtDateTime(r.updatedAt)) +
         '</div></div>',
       footer:
         locked ?
@@ -765,6 +763,7 @@
             filenameBase: 'IT_Lab_Maintenance',
             totals: ['quantity']
           });
+      if (!name) return;
           ITL.activity.log('Maintenance', 'Exported', '', 'Downloaded ' + name + ' (' + data.length + ' records)');
           ITL.toast.success('Excel downloaded', name);
         });

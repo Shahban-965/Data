@@ -119,7 +119,6 @@
         { key: 'storage', label: 'Storage', sortable: true },
         { key: 'os', label: 'Operating System', sortable: true },
         { key: 'status', label: 'Status', sortable: true, width: '110px', render: function (r) { return ui.pcStatusBadge(r.status); } },
-        { key: 'updatedAt', label: 'Updated', sortable: true, cls: 'cell-date', width: '112px', render: function (r) { return U.esc(U.fmtDate(r.updatedAt)); } }
       ],
       actions: function (r) {
         return ui.rowActions([
@@ -342,11 +341,9 @@
         '<div class="detail-grid">' +
         ui.field('Operating System', r.os) + ui.field('Software Installed', r.software) +
         '</div></div>' +
-        '<div class="detail-section">' + ui.sectionTitle('Status & audit', 'info') +
+        '<div class="detail-section">' + ui.sectionTitle('Status', 'info') +
         '<div class="detail-grid">' +
         ui.field('Status', ui.pcStatusBadge(r.status), { html: true }) +
-        ui.field('Created', U.fmtDateTime(r.createdAt)) +
-        ui.field('Last updated', U.fmtDateTime(r.updatedAt)) +
         ui.field('Remarks', r.remarks, { full: true }) +
         '</div></div>',
       footer:
@@ -403,6 +400,7 @@
             filters: ft.join(', ') || 'None',
             filenameBase: 'IT_Lab_Staff_Systems'
           });
+      if (!name) return;
           ITL.activity.log('Staff Systems', 'Exported', '', 'Downloaded ' + name + ' (' + data.length + ' records)');
           ITL.toast.success('Excel downloaded', name);
         });

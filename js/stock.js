@@ -308,7 +308,7 @@
       onMount: function (el) {
         var b = el.querySelector('[data-tx-export]');
         if (b) b.addEventListener('click', function () {
-          ITL.excel.exportCollection({
+          var snExportGuard = ITL.excel.exportCollection({
             schemaId: 'stockTx',
             rows: rows,
             reportTitle: 'STOCK TRANSACTION HISTORY — ' + String(item.itemName).toUpperCase(),
@@ -317,6 +317,7 @@
             scope: 'Single item',
             totals: false
           });
+      if (!snExportGuard) return;
           ITL.activity.log('Store', 'Exported', item.id, 'Downloaded stock history for ' + item.itemName);
           ITL.toast.success('Excel downloaded', 'Stock history exported');
         });

@@ -49,7 +49,7 @@
       root.innerHTML =
         '<div class="page-head">' +
         '<div><div class="page-title">Reports</div>' +
-        '<div class="page-sub">Preview your data, then download a professionally formatted Excel workbook</div></div>' +
+        '<div class="page-sub">Preview your data, then download a clean black &amp; white Excel workbook</div></div>' +
         '</div>' +
 
         '<div class="grid-main-side">' +
@@ -84,13 +84,13 @@
         '<div class="card"><div class="card-head"><div class="card-title">Every Excel report includes</div></div>' +
         '<div class="card-body"><div class="stack-2" style="font-size:12.5px">' +
         [
-          'Formatted title banner and generation date',
-          'Bold, colour-filled header row',
-          'Frozen header row so it stays visible',
-          'Excel AutoFilter on the real table range',
-          'Readable column widths and borders',
+          'Strict black &amp; white — white paper, black ink',
+          'Headers in row 1, records from row 2 — no banner rows',
+          'Empty columns and empty rows are removed automatically',
+          'No Created / Updated date columns',
+          'Frozen header row and Excel AutoFilter',
           'Real dates (dd-mmm-yyyy) and numeric quantities',
-          'Clean sheet names — no internal data'
+          'No file is downloaded when there is no data'
         ].map(function (t) {
           return '<div class="row-2" style="gap:8px;align-items:flex-start">' +
             '<span style="color:var(--success-fg);flex:0 0 auto;display:grid;place-items:center">' + ITL.icon('check') + '</span>' +
@@ -450,6 +450,7 @@
           ds.schemaId === 'store' ? ['quantity'] :
             ds.schemaId === 'purchases' ? ['quantity'] : false
       });
+      if (!name) return;
       ITL.activity.log('Reports', 'Exported', '', 'Generated ' + ds.label + ' report — ' + name + ' (' + ds.rows.length + ' records)');
       ITL.toast.success('Excel downloaded', name);
     });
@@ -476,6 +477,10 @@
       if (lab && r.lab !== lab) return false;
       return true;
     }), 'complaintDate', 'asc');
+    if (!rows.length) {
+      ITL.toast.warn('Nothing to download', 'There are no maintenance records for ' + label + '. No empty Excel file was created.');
+      return;
+    }
 
     ITL.modal.withBusy('Generating Excel…', 'Building the monthly maintenance report', function () {
       var s = ITL.settings.get();
@@ -543,7 +548,8 @@
       ];
 
       var fname = 'IT_Lab_Monthly_Maintenance_' + key + '.xlsx';
-      ITL.excel.download({ filename: fname, title: 'Monthly Maintenance Report', sheets: sheets });
+      var snExportGuard = ITL.excel.download({ filename: fname, title: 'Monthly Maintenance Report', sheets: sheets });
+      if (!snExportGuard) return;
       ITL.activity.log('Reports', 'Exported', '', 'Generated monthly maintenance report for ' + label);
       ITL.toast.success('Excel downloaded', fname);
     });
@@ -552,6 +558,12 @@
   /* ------------------------------------------------- complete 10-sheet */
   rep.completeReport = function () {
     var v = view(), f = v.filters;
+    var hasData = ['pcs', 'staff', 'maintenance', 'store', 'purchases', 'stockTx']
+      .some(function (k) { return ITL.data[k]().length > 0; });
+    if (!hasData) {
+      ITL.toast.warn('Nothing to download', 'The database is empty. No empty Excel file was created.');
+      return;
+    }
 
     ITL.modal.withBusy('Generating Excel…', 'Building the complete 10-sheet workbook', function () {
       var s = ITL.settings.get();
@@ -688,9 +700,11 @@
       });
 
       var fname = 'IT_Lab_Complete_Report_' + U.stampDate() + '.xlsx';
-      ITL.excel.download({ filename: fname, title: 'Complete IT Lab Report', sheets: sheets });
-      ITL.activity.log('Reports', 'Exported', '', 'Generated complete IT lab report (' + sheets.length + ' sheets)');
-      ITL.toast.success('Excel downloaded', fname + ' · ' + sheets.length + ' sheets');
+      var included = sheets.filter(function (s) { return ITL.excel.sheetHasData(s.ws); }).length;
+      var snExportGuard = ITL.excel.download({ filename: fname, title: 'Complete IT Lab Report', sheets: sheets });
+      if (!snExportGuard) return;
+      ITL.activity.log('Reports', 'Exported', '', 'Generated complete IT lab report (' + included + ' non-empty sheets)');
+      ITL.toast.success('Excel downloaded', fname + ' · ' + included + ' sheets with data');
     });
   };
 
