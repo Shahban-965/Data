@@ -28,10 +28,12 @@
     },
 
     applyTheme: function () {
-      document.documentElement.setAttribute('data-theme', 'dark'); // single theme: dark
+      // Appearance is owned by the new View Studio (saved in DATA/ui-state.json).
+      if (w.SN_appearance && w.SN_appearance.apply) w.SN_appearance.apply();
+      else document.documentElement.setAttribute('data-theme', 'light');
     },
 
-    toggleTheme: function () { /* single dark theme */ }
+    toggleTheme: function () { if (w.SN_appearance && w.SN_appearance.toggleMode) w.SN_appearance.toggleMode(); }
   };
 
   /* ============================================================== PAGE */
@@ -39,12 +41,14 @@
 
   page.settings = {
     title: 'Settings',
-    subtitle: 'Configure the application, review local storage and manage your data',
+    subtitle: 'Configure the application, review the permanent DATA folder and manage your records',
 
     render: function (root) {
       var s = set.get();
       var counts = S.counts();
       var usage = S.usage();
+      var disk = S.status();
+      var verify = S.verify();
 
       root.innerHTML =
         '<div class="page-head">' +
@@ -114,8 +118,7 @@
 
         '<div class="divider-label">Export preferences</div>' +
         '<div class="stack-3">' +
-        '<label class="check"><input type="checkbox" name="exportIncludeTimestamps" form="settingsForm"' + (s.exportIncludeTimestamps !== false ? ' checked' : '') + '>' +
-        '<span><b>Include Created / Updated columns</b><div class="help-text">Adds audit timestamps to every Excel export.</div></span></label>' +
+        '<div class="help-text">Excel exports are black &amp; white, start at row 1, and never include Created / Updated dates or empty rows and columns.</div>' +
 
         '<label class="check"><input type="checkbox" name="exportIncludePasswords" form="settingsForm"' + (s.exportIncludePasswords ? ' checked' : '') + '>' +
         '<span><b>Include password columns in Excel exports</b><div class="help-text">Off by default. Passwords are never sent anywhere — they stay in this browser.</div></span></label>' +
@@ -158,18 +161,18 @@
         '<div class="stack-4">' +
         '<div class="card"><div class="card-head">' +
         '<div class="modal-head-ico">' + ITL.icon('database') + '</div>' +
-        '<div><div class="card-title">Local database</div><div class="card-sub">Browser LocalStorage</div></div></div>' +
+        '<div><div class="card-title">Permanent database</div><div class="card-sub">DATA folder · JSON + TXT</div></div></div>' +
         '<div class="card-body">' +
         '<div class="' + (S.isAvailable() ? 'db-status' : 'db-status warn') + '">' +
         ITL.icon(S.isAvailable() ? 'checkCircle' : 'alert') +
-        (S.isAvailable() ? 'LocalStorage active and writable' : 'LocalStorage unavailable — data will not persist') +
+        (S.isAvailable() ? 'DATA folder writable · every save verified on disk' : 'DATA folder is NOT writable — stop editing and check the drive') +
         '</div>' +
-        '<div style="margin-top:14px">' +
-        '<div class="row-2" style="justify-content:space-between;font-size:12.5px">' +
-        '<span class="muted">Storage used</span><b>' + U.bytes(usage.bytes) + ' / ~' + U.bytes(usage.quota) + '</b></div>' +
-        '<div class="bar-track" style="margin-top:6px"><div class="bar-fill" style="width:' + Math.max(1, usage.percent).toFixed(1) + '%;background:' +
-        (usage.percent > 85 ? 'var(--danger-solid)' : usage.percent > 60 ? 'var(--warn-solid)' : 'var(--success-solid)') + '"></div></div>' +
-        '<div class="help-text" style="margin-top:5px">' + usage.percent.toFixed(1) + '% of the typical 5 MB browser quota.</div>' +
+        '<div style="margin-top:14px" class="stack-2">' +
+        '<div class="row-2" style="justify-content:space-between;font-size:12.5px"><span class="muted">Data on disk</span><b>' + U.bytes(usage.bytes) + '</b></div>' +
+        '<div class="row-2" style="justify-content:space-between;font-size:12.5px"><span class="muted">Files</span><b>' + (disk.files ? disk.files.length : 0) + ' (JSON + TXT)</b></div>' +
+        '<div class="row-2" style="justify-content:space-between;font-size:12.5px"><span class="muted">Last permanent save</span><b>' + (disk.lastWrite ? U.fmtDateTime(disk.lastWrite) : '—') + '</b></div>' +
+        '<div class="row-2" style="justify-content:space-between;font-size:12.5px"><span class="muted">Mirror check</span><b>' + (verify.ok ? 'All pairs match' : 'Needs repair') + '</b></div>' +
+        '<div class="help-text mono truncate" title="' + U.escAttr(disk.dataDir || '') + '">' + U.esc(disk.dataDir || 'Browser preview (no disk folder)') + '</div>' +
         '</div>' +
         '<hr>' +
         ITL.ui.kv([
@@ -194,20 +197,21 @@
         }).join('') +
         '</div>' +
         '<div class="alert alert-info mt-4" style="font-size:12px">' + ITL.icon('info') +
-        '<div class="alert-body">Data is stored in <b>this browser on this computer only</b>. It does not sync to other machines. ' +
-        'Use <b>Backup &amp; Restore</b> to move data between computers.</div></div>' +
+        '<div class="alert-body">Every record is saved permanently in the <b>DATA</b> folder as <b>.json</b> and <b>.txt</b>. Copy or share the whole project folder and the same data arrives with it — no RAM-only or browser-only storage.</div></div>' +
         '</div></div>' +
 
         '<div class="card"><div class="card-head"><div class="card-title">About</div></div>' +
         '<div class="card-body">' +
         ITL.ui.kv([
           ['Application', 'IT Lab Management System'],
-          ['Version', '1.0.0'],
+          ['Version', '2.0.0 · ATLAS'],
           ['Schema version', String(S.SCHEMA_VERSION)],
           ['Engine', 'HTML5 · CSS3 · Vanilla JS'],
           ['Excel engine', 'SheetJS / XLSX'],
-          ['Storage', 'Browser LocalStorage'],
-          ['Mode', 'Offline · frontend only']
+          ['Storage', 'Portable DATA folder (JSON + TXT)'],
+          ['Verified writes', String(disk.writeCount || 0)],
+          ['Excel', 'Black &amp; white · no empty rows'],
+          ['Mode', 'Offline · single portable folder']
         ]) +
         '</div></div>' +
 
@@ -286,8 +290,7 @@
       lowStockThreshold: low,
       dateFormat: data.dateFormat || 'dd-MMM-yyyy',
       tablePageSize: data.tablePageSize === 'All' ? 'All' : U.int(data.tablePageSize, 25),
-      theme: 'dark',
-      exportIncludeTimestamps: !!data.exportIncludeTimestamps,
+      theme: 'light',
       exportIncludePasswords: !!data.exportIncludePasswords,
       confirmDeletes: !!data.confirmDeletes,
       exportDefaultScope: data.exportDefaultScope === 'all' ? 'all' : 'filtered'

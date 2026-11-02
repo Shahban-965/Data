@@ -1,75 +1,178 @@
-/* Appearance Studio: theme, accent, shape, layout, density, background, zoom, motion. Saved in localStorage, applied instantly. */
+/* ==========================================================================
+   appearance.js — NOVA / ATLAS "View Studio" v2
+
+   Appearance preferences are DATA, not device-local RAM: they are stored in
+   DATA/ui-state.json through ITL.storage, so the same look travels with the
+   project folder to any PC. The head script paints the defaults instantly;
+   the saved look is applied from disk as soon as the data layer is ready.
+   ========================================================================== */
 (function () {
   'use strict';
-  var KEY = 'itl.appearance', root = document.documentElement;
-  var DEF = { mode: 'dark', accent: 'violet', shape: 'soft', layout: 'float', density: 'comfortable', bg: 'aurora', zoom: '1', motion: 'on', arrows: 'on' };
-  var st = {}; try { st = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) {}
-  Object.keys(DEF).forEach(function (k) { if (st[k] == null) st[k] = DEF[k]; });
-  var mq = window.matchMedia ? matchMedia('(prefers-color-scheme: light)') : null;
+  var root = document.documentElement;
+  var DEF = {
+    mode: 'light', accent: 'cobalt', shape: 'soft',
+    density: 'comfortable', motion: 'on', bg: 'dots'
+  };
+  var st = {};
+  Object.keys(DEF).forEach(function (k) { st[k] = DEF[k]; });
+
   function apply() {
-    var m = st.mode === 'auto' ? (mq && mq.matches ? 'light' : 'dark') : st.mode;
-    root.setAttribute('data-mode', m);
-    root.setAttribute('data-accent', st.accent); root.setAttribute('data-shape', st.shape);
-    root.setAttribute('data-layout', st.layout); root.setAttribute('data-density', st.density);
-    root.setAttribute('data-bg', st.bg); root.setAttribute('data-motion', st.motion); root.setAttribute('data-arrows', st.arrows);
-    root.style.setProperty('--zoom', st.zoom);
-    var mc = document.querySelector('meta[name=theme-color]'); if (mc) mc.content = m === 'light' ? '#eef1f8' : '#07090f';
-    try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {}
+    root.setAttribute('data-mode', st.mode);
+    root.setAttribute('data-accent', st.accent);
+    root.setAttribute('data-shape', st.shape);
+    root.setAttribute('data-density', st.density);
+    root.setAttribute('data-motion', st.motion);
+    root.setAttribute('data-bg', st.bg);
+    root.setAttribute('data-theme', st.mode);
+    var meta = document.querySelector('meta[name=theme-color]');
+    if (meta) meta.content = st.mode === 'dark' ? '#0e1219' : '#10131a';
+    var moon = document.querySelector('#themeToggle .moon');
+    var sun = document.querySelector('#themeToggle .sun');
+    if (moon && sun) {
+      moon.style.display = st.mode === 'dark' ? 'none' : '';
+      sun.style.display = st.mode === 'dark' ? '' : 'none';
+    }
   }
   apply();
-  if (mq && mq.addEventListener) mq.addEventListener('change', function () { if (st.mode === 'auto') apply(); });
 
-  var G = [
-    ['mode', 'Theme', [['dark', 'Dark'], ['light', 'Light'], ['auto', 'Auto']]],
-    ['shape', 'Shape', [['soft', 'Soft'], ['sharp', 'Sharp'], ['pill', 'Pill']]],
-    ['layout', 'Sidebar style', [['float', 'Floating'], ['classic', 'Classic']]],
-    ['density', 'Density', [['comfortable', 'Comfortable'], ['compact', 'Compact']]],
-    ['bg', 'Background', [['aurora', 'Aurora'], ['grid', 'Grid'], ['flat', 'Flat']]],
-    ['zoom', 'Text size', [['.92', 'Small'], ['1', 'Normal'], ['1.08', 'Large']]],
-    ['motion', 'Animations', [['on', 'On'], ['off', 'Off']]],
-    ['arrows', 'Arrow effects', [['on', 'On'], ['off', 'Off']]]
-  ];
-  var ACC = { violet: '#7c5cff,#19e3b1', ocean: '#2f7bff,#22d3ee', sunset: '#ff6b3d,#ff3d8a', forest: '#16a34a,#b6f03c', rose: '#ec4899,#f59e0b', gold: '#f5b301,#ff7a1a', mono: '#8b95ad,#e6eaf5' };
-  var PRE = [
-    ['Midnight', { mode: 'dark', accent: 'violet', shape: 'soft', layout: 'float', density: 'comfortable', bg: 'aurora' }, '#0e121b', '#7c5cff,#19e3b1'],
-    ['Daylight', { mode: 'light', accent: 'ocean', shape: 'soft', layout: 'float', density: 'comfortable', bg: 'flat' }, '#ffffff', '#2f7bff,#22d3ee'],
-    ['Sunset Pill', { mode: 'dark', accent: 'sunset', shape: 'pill', layout: 'float', density: 'comfortable', bg: 'aurora' }, '#0e121b', '#ff6b3d,#ff3d8a'],
-    ['Forest Pro', { mode: 'dark', accent: 'forest', shape: 'sharp', layout: 'classic', density: 'compact', bg: 'grid' }, '#0e121b', '#16a34a,#b6f03c'],
-    ['Paper', { mode: 'light', accent: 'mono', shape: 'sharp', layout: 'classic', density: 'comfortable', bg: 'flat' }, '#ffffff', '#8b95ad,#4b5568']
-  ];
-  var DESC = { mode: 'Dark, light, or follow your computer', shape: 'Corner style of cards, buttons and fields', layout: 'How the left menu looks', density: 'Space inside tables and buttons', bg: 'Backdrop behind the pages', zoom: 'Size of the content area', motion: 'Hover, page and card animations', arrows: 'Glowing arrow cursor, sliding arrows and back-to-top arrow' };
-  function seg(g) {
-    return '<div class="ap-seg">' + g[2].map(function (o) { return '<button type="button" class="ap-opt' + (st[g[0]] === o[0] ? ' on' : '') + '" data-ap="' + g[0] + '" data-v="' + o[0] + '">' + o[1] + '</button>'; }).join('') + '</div>';
+  function storage() { return window.ITL && window.ITL.storage; }
+  function uiKey() { var S = storage(); return S && S.KEYS ? S.KEYS.ui : null; }
+
+  function persist() {
+    var S = storage(), key = uiKey();
+    if (!S || !key || !S.update) return;
+    try { S.update(key, { view: st }); } catch (e) { /* non-fatal */ }
   }
+
+  function hydrate() {
+    var S = storage(), key = uiKey();
+    if (!S || !key) return;
+    try {
+      var ui = S.get(key) || {};
+      if (ui.view && typeof ui.view === 'object') {
+        Object.keys(DEF).forEach(function (k) {
+          if (ui.view[k] !== undefined) st[k] = ui.view[k];
+        });
+      }
+    } catch (e) { /* keep defaults */ }
+    apply();
+  }
+
+  var GROUPS = [
+    ['mode', 'Theme', [['light', 'Paper'], ['dark', 'Ink']]],
+    ['shape', 'Corners', [['soft', 'Soft'], ['sharp', 'Sharp'], ['pill', 'Pill']]],
+    ['density', 'Density', [['comfortable', 'Roomy'], ['compact', 'Compact']]],
+    ['motion', 'Motion', [['on', 'On'], ['off', 'Off']]],
+    ['bg', 'Canvas', [['dots', 'Dots'], ['flat', 'Flat']]]
+  ];
+  var ACCENTS = {
+    cobalt: '#2f61ff', graphite: '#454f61', teal: '#0b9c8a', mono: '#10131a'
+  };
+  var PRESETS = [
+    ['Paper',      { mode: 'light', accent: 'cobalt',   shape: 'soft',  density: 'comfortable', motion: 'on', bg: 'dots' }],
+    ['Ink',        { mode: 'dark',  accent: 'cobalt',   shape: 'soft',  density: 'comfortable', motion: 'on', bg: 'flat' }],
+    ['Blueprint',  { mode: 'dark',  accent: 'teal',     shape: 'sharp', density: 'compact',     motion: 'on', bg: 'dots' }],
+    ['Monochrome', { mode: 'light', accent: 'mono',     shape: 'sharp', density: 'comfortable', motion: 'off', bg: 'flat' }]
+  ];
+  var DESC = {
+    mode: 'Paper (light) or Ink (dark)', accent: 'Single accent used across the interface',
+    shape: 'Corner geometry of cards and buttons', density: 'Spacing inside tables and cards',
+    motion: 'Page entrance, reveal and hover animations', bg: 'Texture behind the content'
+  };
+
+  function segment(g) {
+    return '<div class="ap-seg">' + g[2].map(function (o) {
+      return '<button type="button" class="ap-opt' + (st[g[0]] === o[0] ? ' on' : '') +
+        '" data-ap="' + g[0] + '" data-v="' + o[0] + '">' + o[1] + '</button>';
+    }).join('') + '</div>';
+  }
+
   function studio() {
-    var cur = JSON.stringify([st.mode, st.accent, st.shape, st.layout, st.density, st.bg]);
-    var h = '<div class="card" id="apStudio"><div class="card-head"><div><div class="card-title">Appearance Studio</div><div class="card-sub">Pick a ready-made look, or fine-tune every part below. Saved automatically.</div></div></div>';
-    h += '<div class="ap-presets">' + PRE.map(function (p, i) {
-      var v = p[1], on = cur === JSON.stringify([v.mode, v.accent, v.shape, v.layout, v.density, v.bg]);
-      return '<button type="button" class="ap-pre' + (on ? ' on' : '') + '" data-ap="preset" data-v="' + i + '"><div class="ap-pv" style="background:' + (v.mode === 'light' ? '#eef1f8' : '#07090f') + '"><i class="sb" style="background:' + p[2] + ';border:1px solid rgba(128,128,160,.4);border-radius:' + (v.shape === 'sharp' ? '2px' : v.shape === 'pill' ? '12px' : '6px') + '"></i><div class="mn"><b style="background:' + p[2] + '"></b><em style="background:linear-gradient(135deg,' + p[3] + ');border-radius:' + (v.shape === 'sharp' ? '2px' : v.shape === 'pill' ? '12px' : '6px') + '"></em></div></div><span>' + p[0] + '</span></button>';
-    }).join('') + '</div><div class="ap-rows">';
-    h += '<div class="ap-row"><div><h5>Accent colour</h5><p>Main colour used for buttons, menu and numbers</p></div><div class="ap-opts">' + Object.keys(ACC).map(function (k) {
-      return '<button type="button" class="ap-sw' + (st.accent === k ? ' on' : '') + '" data-ap="accent" data-v="' + k + '" title="' + k + '" aria-label="' + k + '" style="background:linear-gradient(135deg,' + ACC[k] + ')"></button>';
-    }).join('') + '</div></div>';
-    G.forEach(function (g) { h += '<div class="ap-row"><div><h5>' + g[1] + '</h5><p>' + (DESC[g[0]] || '') + '</p></div>' + seg(g) + '</div>'; });
-    return h + '</div><div class="ap-foot"><span>Changes are stored on this computer only.</span><button type="button" class="ap-opt" data-ap="reset">Reset appearance</button></div></div>';
+    var cur = JSON.stringify([st.mode, st.accent, st.shape, st.density, st.motion, st.bg]);
+    var h = '<div class="card" id="apStudio"><div class="card-head">' +
+      '<div><div class="card-title">View Studio</div>' +
+      '<div class="card-sub">Pick a ready-made look, or fine-tune each part. Saved permanently in DATA/ui-state.json.</div></div>' +
+      '</div><div class="ap-presets">';
+    h += PRESETS.map(function (p, i) {
+      var v = p[1];
+      var on = cur === JSON.stringify([v.mode, v.accent, v.shape, v.density, v.motion, v.bg]);
+      var bg = v.mode === 'dark' ? '#0e1219' : '#f3f5f8';
+      var accent = ACCENTS[v.accent] || '#2f61ff';
+      return '<button type="button" class="ap-pre' + (on ? ' on' : '') + '" data-ap="preset" data-v="' + i + '">' +
+        '<div class="ap-pv" style="background:' + bg + '">' +
+        '<i class="sb" style="background:' + accent + ';border:1px solid rgba(128,128,160,.35);border-radius:' +
+        (v.shape === 'sharp' ? '2px' : v.shape === 'pill' ? '12px' : '6px') + '"></i>' +
+        '<div class="mn"><b style="background:' + accent + '"></b>' +
+        '<em style="background:linear-gradient(135deg,' + accent + ', ' + bg + ');border-radius:' +
+        (v.shape === 'sharp' ? '2px' : v.shape === 'pill' ? '12px' : '6px') + '"></em></div></div>' +
+        '<span>' + p[0] + '</span></button>';
+    }).join('');
+    h += '</div><div class="ap-rows">';
+    h += '<div class="ap-row"><div><h5>Accent</h5><p>' + DESC.accent + '</p></div><div class="ap-opts">' +
+      Object.keys(ACCENTS).map(function (k) {
+        return '<button type="button" class="ap-sw' + (st.accent === k ? ' on' : '') +
+          '" data-ap="accent" data-v="' + k + '" title="' + k + '" aria-label="' + k +
+          '" style="background:' + ACCENTS[k] + '"></button>';
+      }).join('') + '</div></div>';
+    GROUPS.forEach(function (g) {
+      h += '<div class="ap-row"><div><h5>' + g[1] + '</h5><p>' + (DESC[g[0]] || '') + '</p></div>' + segment(g) + '</div>';
+    });
+    return h + '</div><div class="ap-foot"><span>These preferences travel with the project folder.</span>' +
+      '<button type="button" class="ap-opt" data-ap="reset">Reset view</button></div></div>';
   }
-  window.SN_appearance = { reset: function () { st = JSON.parse(JSON.stringify(DEF)); apply(); var s = document.getElementById('apStudio'); if (s) s.outerHTML = studio(); } };
-  document.addEventListener('click', function (e) {
-    var b = e.target.closest && e.target.closest('[data-ap]'); if (b) {
-      if (b.dataset.ap === 'reset') st = JSON.parse(JSON.stringify(DEF)); else if (b.dataset.ap === 'preset') { var pv = PRE[+b.dataset.v][1]; Object.keys(pv).forEach(function (k) { st[k] = pv[k]; }); } else st[b.dataset.ap] = b.dataset.v;
-      apply(); var s = document.getElementById('apStudio'); if (s) s.outerHTML = studio(); return;
+
+  function rerender() {
+    var box = document.getElementById('apStudio');
+    if (box) box.outerHTML = studio();
+  }
+
+  function set(key, value) {
+    if (!(key in DEF)) return;
+    st[key] = value;
+    apply();
+    persist();
+    rerender();
+  }
+
+  window.SN_appearance = {
+    apply: apply,
+    get: function () { return Object.assign({}, st); },
+    set: set,
+    toggleMode: function () { set('mode', st.mode === 'dark' ? 'light' : 'dark'); },
+    reset: function () {
+      Object.keys(DEF).forEach(function (k) { st[k] = DEF[k]; });
+      apply(); persist(); rerender();
     }
-    if (e.target.closest && e.target.closest('#themeQuick')) { st.mode = root.getAttribute('data-mode') === 'light' ? 'dark' : 'light'; apply(); var s2 = document.getElementById('apStudio'); if (s2) s2.outerHTML = studio(); }
+  };
+
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('[data-ap]');
+    if (!b) return;
+    var key = b.getAttribute('data-ap'), v = b.getAttribute('data-v');
+    if (key === 'reset') {
+      Object.keys(DEF).forEach(function (k) { st[k] = DEF[k]; });
+      apply(); persist(); rerender();
+    } else if (key === 'preset') {
+      var pv = PRESETS[parseInt(v, 10)][1];
+      Object.keys(pv).forEach(function (k) { st[k] = pv[k]; });
+      apply(); persist(); rerender();
+    } else set(key, v);
   });
-  function boot() {
-    var q = document.getElementById('quickAddBtn');
-    if (q && !document.getElementById('themeQuick')) q.insertAdjacentHTML('beforebegin', '<button type="button" class="icon-btn" id="themeQuick" aria-label="Switch light/dark theme" title="Light / Dark"><svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>');
-    var m = document.getElementById('appMain'); if (!m) return;
+
+  function ready(fn) {
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+    else fn();
+  }
+
+  ready(function () {
+    hydrate();
+    apply();
+    var main = document.getElementById('appMain');
+    if (!main) return;
     new MutationObserver(function () {
       if (!/settings/.test(location.hash) || document.getElementById('apStudio')) return;
-      var ph = m.querySelector('.page-head'); if (ph) ph.insertAdjacentHTML('afterend', '<div class="mb-4">' + studio() + '</div>');
-    }).observe(m, { childList: true });
-  }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+      var head = main.querySelector('.page-head');
+      if (head) head.insertAdjacentHTML('afterend', '<div class="mb-4">' + studio() + '</div>');
+    }).observe(main, { childList: true });
+  });
 })();

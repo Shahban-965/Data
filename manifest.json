@@ -1,13 +1,13 @@
 {
-  "name": "Shakeel Networking",
-  "short_name": "Shakeel",
-  "description": "Offline IT lab management: PC inventory, staff systems, maintenance, store inventory, purchases and Excel reporting.",
+  "name": "Shakeel Networking ATLAS",
+  "short_name": "SN ATLAS",
+  "description": "Offline portable IT Lab Management System \u00b7 permanent JSON + TXT DATA folder",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#050816",
-  "theme_color": "#050816",
+  "background_color": "#f3f5f8",
+  "theme_color": "#10131a",
   "lang": "en",
   "icons": [
     {

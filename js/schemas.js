@@ -34,8 +34,6 @@
         f('software', 'Software Installed', 'text', 30, ['software', 'software installed', 'installed software', 'applications', 'apps', 'programs']),
         f('status', 'Status', 'text', 13, ['status', 'condition', 'pc status', 'current status', 'state', 'working status']),
         f('remarks', 'Remarks', 'multiline', 28, ['remarks', 'remark', 'note', 'notes', 'comment', 'comments', 'description']),
-        f('createdAt', 'Created At', 'date', 15, ['created at', 'created', 'created date', 'entry date', 'date added']),
-        f('updatedAt', 'Updated At', 'date', 15, ['updated at', 'updated', 'modified', 'last updated', 'modified date'])
       ],
       required: ['pcName'],
       duplicateKeys: ['serialNumber', 'pcName+lab']
@@ -62,8 +60,6 @@
         f('software', 'Software Installed', 'text', 30, ['software', 'software installed', 'installed software', 'applications', 'apps']),
         f('status', 'Status', 'text', 13, ['status', 'condition', 'state', 'working status']),
         f('remarks', 'Remarks', 'multiline', 28, ['remarks', 'remark', 'note', 'notes', 'comment', 'comments']),
-        f('createdAt', 'Created At', 'date', 15, ['created at', 'created', 'created date', 'entry date']),
-        f('updatedAt', 'Updated At', 'date', 15, ['updated at', 'updated', 'modified', 'last updated'])
       ],
       required: ['pcName'],
       duplicateKeys: ['serialNumber', 'pcName']
@@ -91,8 +87,6 @@
         f('status', 'Status', 'text', 14, ['status', 'state', 'progress', 'current status']),
         f('technician', 'Technician', 'text', 18, ['technician', 'engineer', 'assigned to', 'handled by', 'attended by', 'repaired by']),
         f('remarks', 'Remarks', 'multiline', 28, ['remarks', 'remark', 'note', 'notes', 'comment', 'comments']),
-        f('createdAt', 'Created At', 'date', 15, ['created at', 'created', 'entry date']),
-        f('updatedAt', 'Updated At', 'date', 15, ['updated at', 'updated', 'modified'])
       ],
       required: ['problem'],
       duplicateKeys: ['id']
@@ -119,8 +113,6 @@
         f('status', 'Status', 'text', 14, ['status', 'stock status', 'availability']),
         f('purchaseDate', 'Purchase Date', 'date', 14, ['purchase date', 'date', 'received date', 'buy date', 'procurement date']),
         f('remarks', 'Remarks', 'multiline', 26, ['remarks', 'remark', 'note', 'notes', 'comment', 'comments']),
-        f('createdAt', 'Created At', 'date', 15, ['created at', 'created', 'entry date']),
-        f('updatedAt', 'Updated At', 'date', 15, ['updated at', 'updated', 'modified'])
       ],
       required: ['itemName'],
       duplicateKeys: ['itemName+category']
@@ -135,7 +127,7 @@
       storageKey: 'itlab_stock_transactions',
       fields: [
         f('id', 'Transaction ID', 'text', 15, ['transaction id', 'id', 'tx id', 'txn id']),
-        f('date', 'Date', 'date', 14, ['date', 'transaction date', 'entry date']),
+        f('date', 'Date', 'date', 14, ['date', 'transaction date']),
         f('itemId', 'Item ID', 'text', 12, ['item id', 'code']),
         f('itemName', 'Item Name', 'text', 24, ['item name', 'item', 'product', 'name']),
         f('type', 'Type', 'text', 14, ['type', 'transaction type', 'movement', 'action']),
@@ -176,8 +168,6 @@
         f('unitPrice', 'Unit Price', 'number', 12, ['unit price', 'price', 'rate', 'cost', 'amount per unit']),
         f('status', 'Status', 'text', 15, ['status', 'order status', 'delivery status']),
         f('remarks', 'Remarks', 'multiline', 26, ['remarks', 'remark', 'note', 'notes', 'comment', 'comments']),
-        f('createdAt', 'Created At', 'date', 15, ['created at', 'created', 'entry date']),
-        f('updatedAt', 'Updated At', 'date', 15, ['updated at', 'updated', 'modified'])
       ],
       required: ['item'],
       duplicateKeys: ['id']
@@ -203,16 +193,18 @@
     }
   };
 
-  /** Fields shown in Excel exports (respecting settings). */
+  /** Fields shown in Excel exports.
+   *  Entry / update (audit) dates are permanently retired from every export.
+   *  Password columns stay opt-in. */
   schemas.exportFields = function (schemaId, opts) {
     opts = opts || {};
     var sc = schemas[schemaId];
     if (!sc) return [];
     var s = (ITL.settings && ITL.settings.get) ? ITL.settings.get() : {};
+    var audit = /^(createdAt|updatedAt|created_at|updated_at|entryDate|updateDate)$/i;
     return sc.fields.filter(function (fd) {
+      if (audit.test(fd.key)) return false;
       if (fd.type === 'password' && !(opts.includePasswords || s.exportIncludePasswords)) return false;
-      if ((fd.key === 'createdAt' || fd.key === 'updatedAt') &&
-        !(opts.includeTimestamps !== undefined ? opts.includeTimestamps : s.exportIncludeTimestamps !== false)) return false;
       return true;
     });
   };

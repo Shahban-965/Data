@@ -174,7 +174,6 @@
         { key: 'condition', label: 'Condition', sortable: true, width: '110px' },
         { key: 'location', label: 'Location', sortable: true },
         { key: 'status', label: 'Status', sortable: true, width: '124px', render: function (r) { return ui.storeStatusBadge(ITL.data.itemStatus(r)); } },
-        { key: 'updatedAt', label: 'Updated', sortable: true, cls: 'cell-date', width: '112px', render: function (r) { return U.esc(U.fmtDate(r.updatedAt)); } }
       ],
       actions: function (r) {
         return ui.rowActions([
@@ -522,11 +521,9 @@
           : ui.emptyState({ icon: 'history', compact: true, title: 'No movements yet', desc: 'Stock changes will be listed here.' })) +
         '</div>' +
 
-        '<div class="detail-section">' + ui.sectionTitle('Remarks & audit', 'info') +
+        '<div class="detail-section">' + ui.sectionTitle('Remarks', 'info') +
         '<div class="detail-grid">' +
         ui.field('Remarks', r.remarks, { full: true }) +
-        ui.field('Created', U.fmtDateTime(r.createdAt)) +
-        ui.field('Last updated', U.fmtDateTime(r.updatedAt)) +
         '</div></div>',
       footer:
         '<button type="button" class="btn btn-success btn-sm" data-si="in">' + ITL.icon('plusCircle') + 'Add</button>' +
@@ -595,6 +592,7 @@
             filenameBase: 'IT_Lab_Store_Inventory',
             totals: ['quantity']
           });
+      if (!name) return;
           ITL.activity.log('Store', 'Exported', '', 'Downloaded ' + name + ' (' + data.length + ' items)');
           ITL.toast.success('Excel downloaded', name);
         });
@@ -612,6 +610,7 @@
         filenameBase: 'IT_Lab_Stock_Transactions',
         totals: ['quantity']
       });
+      if (!name) return;
       ITL.activity.log('Store', 'Exported', '', 'Downloaded ' + name + ' (' + rows.length + ' transactions)');
       ITL.toast.success('Excel downloaded', name);
     });

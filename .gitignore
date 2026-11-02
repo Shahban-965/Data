@@ -3,3 +3,5 @@ release/
 .DS_Store
 Thumbs.db
 *.writing
+DATA/backup/
+DATA/save-log.txt

@@ -2,7 +2,7 @@
 setlocal
 cd /d "%~dp0"
 echo ================================================
-echo  SHAKEEL NETWORKING - ULTIMATE PORTABLE BUILDER
+echo  SHAKEEL NETWORKING - ATLAS PORTABLE BUILDER
 echo ================================================
 where node >nul 2>nul
 if errorlevel 1 (
@@ -23,7 +23,7 @@ call npm run build:win
 if errorlevel 1 goto fail
 echo.
 echo Build complete. See the release folder.
-echo For USB transfer, copy the portable EXE and its DATA folder together.
+echo For USB transfer, copy the portable EXE and its DATA folder together (JSON + TXT).
 pause
 exit /b 0
 :fail

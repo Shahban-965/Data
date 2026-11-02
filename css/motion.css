@@ -1,0 +1,104 @@
+/* ==========================================================================
+   NOVA / ATLAS — Motion system v2
+   Choreography: staged page entrance, scroll reveal, magnetic hover,
+   ripples, number count-up (JS), and a soft cursor spotlight.
+   Everything respects prefers-reduced-motion and View Studio's motion switch.
+   ========================================================================== */
+
+@keyframes snPageIn {
+  from { opacity: 0; transform: translate3d(0, 14px, 0); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes snRise {
+  from { opacity: 0; transform: translate3d(0, 16px, 0) scale(.985); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes snSlideRight {
+  from { opacity: 0; transform: translate3d(-12px, 0, 0); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes snPop {
+  0%   { opacity: 0; transform: translate3d(0, 22px, 0) scale(.94); }
+  70%  { transform: translate3d(0, -3px, 0) scale(1.01); }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes snToastIn {
+  from { opacity: 0; transform: translate3d(40px, 8px, 0) scale(.96); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes snNavIn {
+  from { opacity: 0; transform: translate3d(-14px, 0, 0); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes snRipple {
+  to { transform: scale(2.6); opacity: 0; }
+}
+
+/* The router's fresh .page gets one clean entrance; children are staggered
+   by the JS motion engine using --sn-i. */
+.page.sn-page-enter { animation: snPageIn .34s var(--ease) both; }
+.sn-reveal { opacity: 0; transform: translate3d(0, 14px, 0); }
+.sn-reveal.sn-in { opacity: 1; transform: none; transition: opacity .42s var(--ease), transform .42s var(--ease); transition-delay: calc(var(--sn-i, 0) * 45ms); }
+.data-table tbody tr.sn-row { opacity: 0; transform: translate3d(-8px, 0, 0); }
+.data-table tbody tr.sn-row.sn-in { opacity: 1; transform: none; transition: opacity .3s var(--ease), transform .3s var(--ease); transition-delay: calc(var(--sn-i, 0) * 22ms); }
+
+.nav-item.sn-nav { animation: snNavIn .38s var(--ease) both; animation-delay: calc(var(--sn-i, 0) * 28ms); }
+.modal { animation: snPop .36s var(--ease) both; }
+.modal-backdrop { animation: snPageIn .2s ease both; }
+.toast { animation: snToastIn .38s var(--ease) both; }
+.toast.leaving { animation: snPageIn .18s ease reverse both; }
+.dropdown-panel { transition-timing-function: var(--ease); }
+
+/* Press ripple on any primary action */
+.btn, .icon-btn, .nav-item { position: relative; overflow: hidden; }
+.sn-ripple {
+  position: absolute; width: 90px; height: 90px; margin: -45px 0 0 -45px;
+  border-radius: 50%; background: currentColor; opacity: .16;
+  pointer-events: none; animation: snRipple .6s var(--ease) forwards;
+}
+.nav-item .sn-ripple { color: #fff; }
+
+/* Soft spotlight that follows the pointer over cards (JS sets --mx/--my) */
+.stat-card::before, .report-card::before, .stat-tile::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(240px circle at var(--mx, -300px) var(--my, -300px),
+    color-mix(in srgb, var(--accent) 9%, transparent), transparent 70%);
+  opacity: 0; transition: opacity .3s;
+}
+.stat-card:hover::before, .report-card:hover::before, .stat-tile:hover::before { opacity: 1; }
+
+/* Page-transition wipe */
+#snWipe {
+  position: fixed; inset: 0; z-index: 800; pointer-events: none;
+  background: linear-gradient(90deg, transparent 0%, var(--accent-soft) 45%, transparent 100%);
+  opacity: 0; transform: translateX(-100%);
+}
+#snWipe.go { animation: snWipeAcross .55s var(--ease) both; }
+@keyframes snWipeAcross {
+  0%   { opacity: 0; transform: translateX(-100%); }
+  35%  { opacity: .55; }
+  100% { opacity: 0; transform: translateX(100%); }
+}
+
+/* Header gains depth after scrolling */
+.app-header.sn-scrolled { box-shadow: 0 10px 26px -20px rgba(16,19,26,.65); }
+
+/* Hover micro-motions */
+.card:hover .card-title { color: var(--accent-ink); }
+.nav-item:hover .nav-ico { transform: translateY(-1px); transition: transform .18s var(--ease); }
+.icon-btn:hover svg { transform: scale(1.06); transition: transform .18s var(--ease); }
+.btn svg, .row-btn svg { transition: transform .18s var(--ease); }
+.btn:hover svg { transform: scale(1.08); }
+
+/* Reduced motion / View Studio switch */
+[data-motion="off"] *, [data-motion="off"] *::before, [data-motion="off"] *::after {
+  animation-duration: .001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: .001ms !important;
+  scroll-behavior: auto !important;
+}
+[data-motion="off"] .sn-reveal, [data-motion="off"] .sn-row { opacity: 1 !important; transform: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+  .sn-reveal, .sn-row { opacity: 1 !important; transform: none !important; }
+}

@@ -152,7 +152,6 @@
         { key: 'storage', label: 'Storage', sortable: true },
         { key: 'os', label: 'Operating System', sortable: true },
         { key: 'status', label: 'Status', sortable: true, width: '110px', render: function (r) { return ui.pcStatusBadge(r.status); } },
-        { key: 'updatedAt', label: 'Updated', sortable: true, cls: 'cell-date', width: '112px', render: function (r) { return U.esc(U.fmtDate(r.updatedAt)); } }
       ],
       actions: function (r) {
         return ui.rowActions([
@@ -418,11 +417,9 @@
         ui.field('Software Installed', r.software) +
         '</div></div>' +
 
-        '<div class="detail-section">' + ui.sectionTitle('Remarks & audit', 'info') +
+        '<div class="detail-section">' + ui.sectionTitle('Remarks', 'info') +
         '<div class="detail-grid">' +
         ui.field('Remarks', r.remarks, { full: true }) +
-        ui.field('Created', U.fmtDateTime(r.createdAt)) +
-        ui.field('Last updated', U.fmtDateTime(r.updatedAt)) +
         '</div></div>';
     }
 
@@ -547,6 +544,7 @@
           filters: filterText.join(', ') || 'None',
           filenameBase: 'IT_Lab_PC_Inventory'
         });
+      if (!name) return;
         ITL.activity.log('PC Inventory', 'Exported', '', 'Downloaded ' + name + ' (' + data.length + ' records)');
         ITL.toast.success('Excel downloaded', name);
       });
@@ -579,8 +577,6 @@
           { field: 'Software Installed', value: r.software },
           { field: 'Status', value: r.status },
           { field: 'Remarks', value: r.remarks },
-          { field: 'Created', value: U.fmtDateTime(r.createdAt) },
-          { field: 'Last Updated', value: U.fmtDateTime(r.updatedAt) },
           { field: 'Total Maintenance Records', value: String(history.length) }
         ]
       });
@@ -595,11 +591,12 @@
       });
 
       var fname = 'IT_Lab_PC_History_' + U.slug(r.pcName || r.id) + '_' + U.stampDate() + '.xlsx';
-      ITL.excel.download({
+      var snExportGuard = ITL.excel.download({
         filename: fname,
         title: 'PC History',
         sheets: [{ name: 'PC Details', ws: infoWs }, { name: 'Maintenance History', ws: histWs }]
       });
+      if (!snExportGuard) return;
       ITL.activity.log('PC Inventory', 'Exported', r.id, 'Downloaded PC history for ' + (r.pcName || r.id));
       ITL.toast.success('Excel downloaded', fname);
     });

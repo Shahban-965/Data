@@ -16,10 +16,23 @@
   /* ================================================================ BOOT */
   app.boot = function () {
     try {
-      if (!S.isAvailable()) {
+      var ensure = S.ensureFiles();
+      if (ensure && ensure.ok && ensure.repaired && ensure.repaired.length) {
+        console.info('[app] DATA files repaired on boot:', ensure.repaired);
         setTimeout(function () {
-          ITL.toast.error('Storage unavailable',
-            'LocalStorage is blocked in this browser (private mode?). Data will only last for this session.', 12000);
+          ITL.toast.info('Data files repaired', ensure.repaired.length + ' JSON/TXT pair(s) were restored from the text mirror.', 9000);
+        }, 900);
+      }
+      var disk = S.status();
+      var flush = S.flush();
+      if (disk && disk.ok === false || (flush && flush.ok === false)) {
+        setTimeout(function () {
+          ITL.toast.error('DATA folder not writable',
+            'Stop editing until the USB drive is reconnected. Nothing is kept in RAM: unsaved changes cannot be recovered.', 15000);
+        }, 900);
+      } else if (!S.isPortable()) {
+        setTimeout(function () {
+          ITL.toast.info('Browser preview', 'For permanent JSON + TXT data, run the Windows portable build.', 9000);
         }, 900);
       }
 
@@ -42,6 +55,14 @@
       registerServiceWorker();
 
       ITL.state.booted = true;
+      // Keep the "last permanent save" indicator honest: it reads meta.json
+      // from the DATA folder, not a RAM timestamp.
+      var chromeTimer = null;
+      S.subscribe(function () {
+        if (chromeTimer) clearTimeout(chromeTimer);
+        chromeTimer = setTimeout(function () { app.refreshChrome(); }, 350);
+      });
+      w.addEventListener('beforeunload', function () { try { S.flush(); } catch (e) { /* ignore */ } });
       hideLoader();
     } catch (err) {
       console.error('[app] boot failed', err);
@@ -229,15 +250,21 @@
     });
 
     var usage = S.usage();
+    var disk = S.status();
     var fill = document.querySelector('.sm-fill');
-    var label = document.querySelector('.sm-value');
+    var label = document.querySelector('#lastSaveText');
+    var legacy = document.querySelector('.sm-value');
     if (fill) {
-      fill.style.width = Math.max(1, Math.min(100, usage.percent)).toFixed(1) + '%';
-      fill.style.background = usage.percent > 85 ? 'var(--danger-solid)' : usage.percent > 60 ? 'var(--warn-solid)' : '';
+      fill.style.width = S.isPortable() ? '100%' : Math.max(1, Math.min(100, usage.percent)).toFixed(1) + '%';
+      fill.style.background = '';
     }
-    if (label) label.textContent = S.isPortable() ? ('JSON · ' + U.bytes(usage.bytes)) : U.bytes(usage.bytes);
+    var saved = disk.lastWrite ? U.fmtDateTime(disk.lastWrite) : 'No writes yet';
+    if (label) label.textContent = S.isPortable() ? saved : 'Preview';
+    if (legacy && legacy !== label) legacy.textContent = S.isPortable() ? saved : 'Preview';
     var meter = document.querySelector('.storage-meter');
-    if (meter && S.isPortable()) meter.title = 'Portable JSON database · ' + S.dataFolder();
+    if (meter) meter.title = S.isPortable()
+      ? 'Permanent DATA folder: ' + S.dataFolder() + ' · ' + (disk.writeCount || 0) + ' verified writes · last save ' + saved
+      : 'Browser preview only — run the portable build for permanent data';
 
     var bn = document.querySelector('.brand-name');
     if (bn) bn.textContent = s.brandName || 'Shakeel Networking';
@@ -265,7 +292,7 @@
 
     var toggle = document.getElementById('sidebarToggle');
     if (toggle) toggle.addEventListener('click', function () {
-      if (w.innerWidth <= 900) {
+      if (w.innerWidth <= 980) {
         shell.classList.toggle('mobile-nav-open');
       } else {
         shell.classList.toggle('sidebar-collapsed');

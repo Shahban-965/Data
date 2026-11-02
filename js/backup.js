@@ -37,7 +37,7 @@
       root.innerHTML =
         '<div class="page-head">' +
         '<div><div class="page-title">Backup &amp; Restore</div>' +
-        '<div class="page-sub">Protect your local data and move it between computers</div></div>' +
+        '<div class="page-sub">Permanent DATA folder · copy or share the whole project folder and the data travels with it</div></div>' +
         '<div class="page-head-actions">' +
         '<button class="btn btn-secondary" data-action="restore">' + ITL.icon('upload') + 'Import Full Backup</button>' +
         '<button class="btn btn-primary" data-action="backup">' + ITL.icon('save') + 'Export Full Backup</button>' +
@@ -45,9 +45,9 @@
 
         '<div class="alert alert-warn mb-4">' + ITL.icon('alert') +
         '<div class="alert-body"><div class="alert-title">Important — how offline storage works</div>' +
-        'This application stores data in <b>this browser on this computer</b> using LocalStorage. There is no server and no cloud database, ' +
-        'so data does <b>not</b> synchronise automatically to other machines. Clearing your browser data will erase it. ' +
-        'Export a JSON backup regularly and keep it somewhere safe.</div></div>' +
+        'Every record is written permanently to the <b>DATA</b> folder beside the app as a <b>.json</b> file <i>and</i> a readable <b>.txt</b> copy. ' +
+        'Nothing is kept only in RAM or only in one computer. Copy / share the whole project folder and the same data travels with it. ' +
+        'Keep a second backup on another drive as well.</div></div>' +
 
         '<div class="card">' +
         '<div class="tabs" role="tablist">' +
@@ -120,17 +120,16 @@
       '<div class="card"><div class="card-body">' +
       '<div class="' + (S.isAvailable() ? 'db-status' : 'db-status warn') + '">' +
       ITL.icon(S.isAvailable() ? 'checkCircle' : 'alert') +
-      (S.isAvailable() ? 'LocalStorage active and writable' : 'LocalStorage unavailable') + '</div>' +
-      '<div style="margin-top:14px">' +
-      '<div class="row-2" style="justify-content:space-between;font-size:12.5px"><span class="muted">Storage used</span>' +
-      '<b>' + U.bytes(usage.bytes) + ' / ~' + U.bytes(usage.quota) + '</b></div>' +
-      '<div class="bar-track" style="margin-top:6px"><div class="bar-fill" style="width:' + Math.max(1, usage.percent).toFixed(1) + '%;background:' +
-      (usage.percent > 85 ? 'var(--danger-solid)' : usage.percent > 60 ? 'var(--warn-solid)' : 'var(--success-solid)') + '"></div></div>' +
+      (S.isAvailable() ? 'DATA folder writable · JSON + TXT verified' : 'DATA folder is NOT writable') + '</div>' +
+      '<div style="margin-top:14px" class="stack-2">' +
+      '<div class="row-2" style="justify-content:space-between;font-size:12.5px"><span class="muted">Data on disk</span><b>' + U.bytes(usage.bytes) + '</b></div>' +
+      '<div class="row-2" style="justify-content:space-between;font-size:12.5px"><span class="muted">JSON + TXT pairs</span><b>' + (S.verify().ok ? 'verified' : 'needs repair') + '</b></div>' +
       '</div>' +
       '<hr>' +
       ui.kv([
-        ['Schema version', String(S.SCHEMA_VERSION)],
+        ['Storage engine', 'Permanent JSON + TXT v' + S.DATA_ENGINE],
         ['Database created', meta.createdAt ? U.fmtDateTime(meta.createdAt) : '—'],
+        ['Verified writes', U.fmtNum(meta.writeCount || 0)],
         ['Last write', meta.lastWrite ? U.fmtDateTime(meta.lastWrite) + ' (' + U.timeAgo(meta.lastWrite) + ')' : '—']
       ]) +
       '</div></div>' +
@@ -304,6 +303,7 @@
       var name = ITL.excel.exportCollection({
         schemaId: 'logs', rows: rows, filenameBase: 'IT_Lab_Activity_Log', scope: 'All entries'
       });
+      if (!name) return;
       ITL.toast.success('Excel downloaded', name);
     });
   };

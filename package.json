@@ -1,7 +1,7 @@
 {
   "name": "shakeel-networking-ultimate",
-  "version": "1.0.0",
-  "description": "Shakeel Networking \u2014 offline portable IT Lab Management System with USB JSON database",
+  "version": "2.0.0",
+  "description": "Shakeel Networking ATLAS \u2014 offline portable IT Lab Management System with permanent JSON + TXT data files",
   "main": "main.js",
   "author": "Shakeel Networking",
   "license": "UNLICENSED",
@@ -17,7 +17,7 @@
   },
   "build": {
     "appId": "com.shakeelnetworking.itlab",
-    "productName": "Shakeel Networking Ultimate",
+    "productName": "Shakeel Networking ATLAS",
     "asar": true,
     "directories": {
       "output": "release"
